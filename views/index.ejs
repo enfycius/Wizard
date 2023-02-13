@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <title>Document</title>
+
+    <script>
+        function send() {
+            var input = document.getElementById("word");
+            var word = input.value;
+
+            $.ajax({
+                url: "/create",
+                type: 'POST',
+                data: {
+                    word: word,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    input.value = null;
+                },
+                error: function (xhr, status) {
+                    input.value = null;
+                }
+            });
+        };
+            
+            // create_btn.onclick = function (e) {
+                
+            // }
+    </script>
+</head>
+<body>
+    <div class="form" method="POST" action="/create">
+        <div class="title">Welcome</div>
+        <div class="subtitle">Let's create your account!</div>
+        <div class="input-container ic1">
+          <input id="word" name="word" class="input" type="text" placeholder=" " />
+          <div class="cut"></div>
+          <label for="word" class="placeholder">Word</label>
+        </div>
+        <button onclick="send();" id="create_btn" class="submit">submit</button>
+      </div>
+</body>
+</html>
+

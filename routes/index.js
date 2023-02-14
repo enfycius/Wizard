@@ -153,39 +153,43 @@ async function getMeaning(word) {
 } */
 
 async function addToDatabase(word) {
-  try {
-      const response = await notion.pages.create({
-          parent: {
-              database_id: databaseId,
-          },
-          properties: {
-              'Word': {
-                  type: 'title',
-                  title: [
-                  {
-                      type: 'text',
-                      text: {
-                          content: word,
-                      },
-                  },
+  const meaning = await getMeaning(word);
+
+  if(!(meaning.includes("검색한 단어"))) {
+    try {
+        const response = await notion.pages.create({
+            parent: {
+                database_id: databaseId,
+            },
+            properties: {
+                'Word': {
+                    type: 'title',
+                    title: [
+                    {
+                        type: 'text',
+                        text: {
+                            content: word,
+                        },
+                    },
+                    ],
+                },
+                'Meaning' : {
+                    type: 'rich_text',
+                    rich_text: [
+                    {
+                        type: 'text',
+                        text: {
+                            content: meaning,
+                        },
+                    }
                   ],
-              },
-              'Meaning' : {
-                  type: 'rich_text',
-                  rich_text: [
-                  {
-                      type: 'text',
-                      text: {
-                          content: await getMeaning(word),
-                      },
-                  }
-                ],
-              },
-          }    
-      });
-      console.log(response);
-  } catch (error) {
-      console.error(error.body);
+                },
+            }    
+        });
+        console.log(response);
+    } catch (error) {
+        console.error(error.body);
+    }
   }
 }
 

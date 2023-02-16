@@ -190,6 +190,7 @@ async function createItem(word) {
     if(!(result)) {
       try {
         addToDatabase(word);
+        addToMySQL(word);
       } catch(e) {}
     } else {
       try {

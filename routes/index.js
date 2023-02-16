@@ -141,6 +141,12 @@ async function addToDatabase(word) {
                     }
                   ],
                 },
+                'Date' : {
+                  type: 'date',
+                  date: {
+                      start: dateTime.create().format('Y-m-d')
+                  }
+                }
             }    
         });
         console.log(response);  
@@ -199,7 +205,7 @@ router.get('/', function(req, res, next) {
 
       try {
           var rows = null;
-          
+
           const connection = await pool.getConnection(async(conn) => conn);
 
           try {

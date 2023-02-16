@@ -45,6 +45,20 @@ async function getMeaning(word) {
   return meaning;
 }
 
+async function addToMySQL(word) {
+  const meaning = await getMeaning(word);
+  
+  if(!(meaning.includes("검색한 단어"))) {
+    try {
+      connection.query('INSERT INTO Dictionary VALUES (?, ?, ?)', [word, meaning, dateTime.create().format('Y-m-d')], (error, rows) => {
+        if (error) throw error;
+    
+        console.log(rows);
+      })
+    } catch(e) { console.log(e); }
+  }
+}
+
 async function addToDatabase(word) {
   const meaning = await getMeaning(word);
 
@@ -84,14 +98,6 @@ async function addToDatabase(word) {
         console.error(error.body);
     }
   }
-
-  try {
-    connection.query('INSERT INTO Dictionary VALUES (?, ?, ?)', [word, meaning, dateTime.create().format('Y-m-d')], (error, rows) => {
-      if (error) throw error;
-  
-      console.log(rows);
-    })
-  } catch(e) { console.log(e); }
 }
 
 async function queryDatabase(word) {
@@ -128,6 +134,10 @@ async function createItem(word) {
     if(!(result)) {
       try {
         addToDatabase(word);
+      } catch(e) {}
+    } else {
+      try {
+        addToMySQL(word);
       } catch(e) {}
     }
   })

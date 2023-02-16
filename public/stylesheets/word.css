@@ -70,6 +70,7 @@ h2 a {
 
 .table_container {
   overflow-x: auto;
+  word-wrap: break-word;
 }
 
 /* Background-color of the odd rows */

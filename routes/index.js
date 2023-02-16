@@ -3,8 +3,14 @@ const { Client } = require("@notionhq/client");
 var express = require('express');
 var router = express.Router();
 
+const dateTime = require('node-datetime');
+
 const axios = require('axios');
 const cheerio = require('cheerio');
+
+const mysql = require('mysql');
+const dbconfig = require('./../config/database.js');
+const connection = mysql.createConnection(dbconfig);
 
 require('dotenv').config();
 
@@ -17,58 +23,6 @@ const notion = new Client({ auth: process.env.NOTION_KEY });
 const databaseId = process.env.NOTION_DATABASE_ID;
 
 var meaning = null;
-
-/* async function findAndSendMeaning(word_data) {
-  console.log("\nFetching tasks from Notion DB...");
-  const [length, word] = await getTasksFromNotionDatabase();
-
-  console.log(word_data);
-  
-  cur_length = length;
-
-  console.log(cur_length);
-  console.log(word);
-  
-  const update_length = await findUpdatedTasks(cur_length);
-  
-  console.log(update_length);
-
-  console.log(`Found ${update_length} updated tasks.`);
-
-  if(update_length > 0) {
-    console.log("Trigger Event");
-
-    sleep(2000);
-
-    const [length, word] = await getTasksFromNotionDatabase();
-    
-    try {
-      update_word = word.toString();
-    } catch(e) {
-      update_word = "";
-    }
-
-    await axios.get("http://aha-dic.com/View.asp?word=" + update_word)
-    .then(async (html) => {
-      const $ = cheerio.load(html.data);
-      var count = 0;
-      var meaning = "";
-      // console.log(html.data);
-
-
-      $('ul li').each((idx, el) => {
-        if(count != 0)
-          meaning += ', ';
-        
-        meaning += $(el).text()
-        count++;
-      });
-
-      updateItem(update_word, meaning);
-    })
-    .catch((err) => console.log(err));
-  }
-} */
 
 async function getMeaning(word) {
   await axios.get("http://aha-dic.com/View.asp?word=" + word)
@@ -90,67 +44,6 @@ async function getMeaning(word) {
 
   return meaning;
 }
-
-
-/* async function findUpdatedTasks(cur_length) {
-  if(cur_length == ex_length) {
-    return 0;
-  } else if(cur_length > ex_length) {
-    const temp_length = ex_length;
-    
-    ex_length = cur_length;
-
-    return (cur_length - temp_length);
-  } else {
-    const [length, word] = await getTasksFromNotionDatabase();
-    
-    cur_length = ex_length = length;
-
-    return 0;
-  }
-} */
-
-/* async function setInitialTaskPageIdToStatusMap() {
-  const [length, word] = await getTasksFromNotionDatabase();
-
-  cur_length = length;
-  ex_length = cur_length;
-} */
-
-/* async function getTasksFromNotionDatabase() {
-  const pages = [];
-  let cursor = undefined;
-
-  while (true) {
-    const { results, next_cursor } = await notion.databases.query({
-      database_id: databaseId,
-      start_cursor: cursor,
-    })
-    pages.push(...results)
-    if (!next_cursor) {
-      break;
-    }
-    cursor = next_cursor;
-  }
-  console.log(`${pages.length} pages successfully fetched.`);
-
-  var page = pages[0];
-
-  // for (const page of pages) {
-  //   // const pageId = page.id
-
-  //   // const responseResults = results.map((page) => {
-  //   //   return {
-  //   //     id: page.id,
-  //   //     word: page.properties.Word.title[0]?.plain_text,
-  //   //     meaning: page.properties.Meaning.rich_text[0]?.plain_text,
-  //   //   };
-  //   // });
-
-  //   console.log(page.properties.Word.title[0]?.plain_text);
-  // }
-  return [pages.length, page.properties.Word.title[0]?.plain_text];
-} */
 
 async function addToDatabase(word) {
   const meaning = await getMeaning(word);
@@ -187,6 +80,16 @@ async function addToDatabase(word) {
             }    
         });
         console.log(response);
+        
+        try {
+          connection.query('INSERT INTO Dictionary VALUES (?, ?, ?)', [word, meaning, dateTime.create().format('Y-m-d')], (error, rows) => {
+            if (error) throw error;
+        
+            console.log(rows);
+          })
+        } catch(e) { console.log(e); }
+
+        
     } catch (error) {
         console.error(error.body);
     }
@@ -234,15 +137,17 @@ async function createItem(word) {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  try {
+    connection.query('SELECT * from Dictionary WHERE date = ?', [dateTime.create().format('Y-m-d')], (error, rows) => {
+      if (error) throw error;
+  
+      res.render('index', { pages: JSON.stringify(rows) });
+    })
+  } catch(e) { console.log(e); }
 });
 
 router.post('/create', function(req, res, next) {
   var word = req.body.word;
-  
-  // setInitialTaskPageIdToStatusMap().then(() => {
-  //   findAndSendEmailsForUpdatedTasks(req.body.word);
-  // });
 
   createItem(word);
 

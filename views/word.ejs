@@ -10,21 +10,23 @@
 <body>
     <h1><span class="blue">&lt;</span>Word<span class="blue">&gt;</span> <span class="yellow">Dictionary</pan></h1>
         
-        <table class="container">
-            <thead>
-                <tr>
-                    <th><h1>Word</h1></th>
-                    <th><h1>Meaning</h1></th>
-                </tr>
-            </thead>
-            <tbody>
-                <% for (var i=0; i<pages.length; i++) { %>
-                <tr>
-                    <td><%= pages[i].word %></td>
-                    <td><%= pages[i].meaning %></td>
-                </tr>
-               <% } %>
-            </tbody>
-        </table>
+        <div class="table_container">
+            <table class="container">
+                <thead>
+                    <tr>
+                        <th><h1>Word</h1></th>
+                        <th><h1>Meaning</h1></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for (var i=0; i<pages.length; i++) { %>
+                    <tr>
+                        <td><%= pages[i].word %></td>
+                        <td><%= pages[i].meaning %></td>
+                    </tr>
+                <% } %>
+                </tbody>
+            </table>
+        </div>
 </body>
 </html>

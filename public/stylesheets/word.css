@@ -38,10 +38,10 @@ h2 a {
 .yellow { color: #FFF842; }
 
 .container th h1 {
-    font-weight: bold;
-    font-size: 1em;
-  text-align: left;
-  color: #185875;
+  font-weight: bold;
+  font-size: 1em;
+  text-align: center;
+  color: #4DC3FA;;
 }
 
 .container td {
@@ -53,18 +53,23 @@ h2 a {
 }
 
 .container {
-    text-align: left;
-    overflow: hidden;
+    text-align: center;
+    overflow: auto;
     width: 80%;
     margin: 0 auto;
-  display: table;
-  padding: 0 0 8em 0;
+    display: table;
+    padding: 0 0 8em 0;
 }
 
 .container td, .container th {
     padding-bottom: 2%;
     padding-top: 2%;
-  padding-left:2%;  
+    padding-left: 2%;  
+    padding-right: 2%;
+}
+
+.table_container {
+  overflow-x: auto;
 }
 
 /* Background-color of the odd rows */
@@ -91,17 +96,17 @@ h2 a {
 }
 
 .container td:hover {
-  background-color: #FFF842;
-  color: #403E10;
-  font-weight: bold;
+    background-color: #FFF842;
+    color: #403E10;
+    font-weight: bold;
+
+    box-shadow: #7F7C21 -1px 1px, #7F7C21 -2px 2px, #7F7C21 -3px 3px, #7F7C21 -4px 4px, #7F7C21 -5px 5px, #7F7C21 -6px 6px;
+    transform: translate3d(6px, -6px, 0);
   
-  box-shadow: #7F7C21 -1px 1px, #7F7C21 -2px 2px, #7F7C21 -3px 3px, #7F7C21 -4px 4px, #7F7C21 -5px 5px, #7F7C21 -6px 6px;
-  transform: translate3d(6px, -6px, 0);
-  
-  transition-delay: 0s;
+    transition-delay: 0s;
     transition-duration: 0.4s;
     transition-property: all;
-  transition-timing-function: line;
+    transition-timing-function: line;
 }
 
 @media (max-width: 800px) {

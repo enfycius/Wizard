@@ -79,21 +79,19 @@ async function addToDatabase(word) {
                 },
             }    
         });
-        console.log(response);
-        
-        try {
-          connection.query('INSERT INTO Dictionary VALUES (?, ?, ?)', [word, meaning, dateTime.create().format('Y-m-d')], (error, rows) => {
-            if (error) throw error;
-        
-            console.log(rows);
-          })
-        } catch(e) { console.log(e); }
-
-        
+        console.log(response);  
     } catch (error) {
         console.error(error.body);
     }
   }
+
+  try {
+    connection.query('INSERT INTO Dictionary VALUES (?, ?, ?)', [word, meaning, dateTime.create().format('Y-m-d')], (error, rows) => {
+      if (error) throw error;
+  
+      console.log(rows);
+    })
+  } catch(e) { console.log(e); }
 }
 
 async function queryDatabase(word) {

@@ -8,9 +8,9 @@ const dateTime = require('node-datetime');
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const mysql = require('mysql');
+const mysql = require('mysql2/promise');
 const dbconfig = require('./../config/database.js');
-const connection = mysql.createConnection(dbconfig);
+const pool = mysql.createPool(dbconfig);
 
 require('dotenv').config();
 
@@ -47,16 +47,66 @@ async function getMeaning(word) {
 
 async function addToMySQL(word) {
   const meaning = await getMeaning(word);
+
+  var exist_row = null;
   
   if(!(meaning.includes("검색한 단어"))) {
-    try {
-      connection.query('INSERT INTO Dictionary VALUES (?, ?, ?)', [word, meaning, dateTime.create().format('Y-m-d')], (error, rows) => {
-        if (error) throw error;
-    
-        console.log(rows);
-      })
-    } catch(e) { console.log(e); }
-  }
+      await (async() => {
+        try {
+          const connection = await pool.getConnection(async(conn) => conn);
+            try {
+              exist_row = await connection.query('SELECT * from Dictionary WHERE word = ?', [word]);
+        
+              await connection.commit();
+              connection.release();
+
+              return [rows];
+            } catch(error) { 
+              await connection.rollback();
+              connection.release();
+            };
+        } catch(error) { };
+      })();
+      
+      if(exist_row[0].length != 0) {
+          await (async() => {
+            try {
+              const connection = await pool.getConnection(async(conn) => conn);
+
+              try {
+                await connection.query('UPDATE Dictionary SET date = ? WHERE word = ?', [dateTime.create().format('Y-m-d'), word]);
+          
+                await connection.commit();
+                
+                connection.release();
+              } catch(error) {
+                await connection.rollback();
+
+                connection.release();
+              }
+            } catch(error) { };
+          })();
+      } else {
+          await (async() => {
+            try {
+              const connection = await pool.getConnection(async(conn) => conn);
+              
+              try {
+                await connection.query('INSERT INTO Dictionary VALUES (?, ?, ?)', [word, meaning, dateTime.create().format('Y-m-d')]);
+  
+                await connection.commit();
+
+                connection.release();
+              } catch(error) {
+                await connection.rollback();
+
+                connection.release();
+              }
+            } catch(error) { };
+            
+          })();
+        }
+      }
 }
 
 async function addToDatabase(word) {
@@ -145,13 +195,33 @@ async function createItem(word) {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  try {
-    connection.query('SELECT * from Dictionary WHERE date = ?', [dateTime.create().format('Y-m-d')], (error, rows) => {
-      if (error) throw error;
-  
-      res.render('index', { pages: JSON.stringify(rows) });
-    })
-  } catch(e) { console.log(e); }
+    const rows = (async() => {
+
+      try {
+          var rows = null;
+          
+          const connection = await pool.getConnection(async(conn) => conn);
+
+          try {
+            await connection.query('SELECT * from Dictionary WHERE date = ?', [dateTime.create().format('Y-m-d')], function(err, results) {
+              rows = results;
+            });
+
+            await connection.commit();
+
+            connection.release();
+          } catch(error) {
+
+            await connection.rollback();
+
+            connection.release();
+          }
+        } catch(error) { };
+
+        return rows;
+      })();
+
+    res.render('index', { pages: JSON.stringify(rows) });
 });
 
 router.post('/create', function(req, res, next) {

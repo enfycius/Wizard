@@ -9,21 +9,109 @@
     <title>Wizard</title>
 
     <script>
+        class Stack {
+            constructor() {
+                this._arr = [];
+            }
+
+            push(item) {
+                this._arr.push(item);
+            }
+
+            pop() {
+                return this._arr.pop();
+            }
+
+            peak() {
+                return this._arr[this._arr.length - 1];
+            }
+
+            get_length() {
+                return this._arr.length;
+            }
+        }
+
+    </script>
+
+    <script>
+        var words = new Array(10);
         var input = null;
+        var cur, index = 0;
         
         $(function() {
             $("#word").focus();
         });
 
         window.onload = function() {
+            const previous = new Stack();
+            const next = new Stack();
+
             input = document.getElementById("word");
 
+            input.onkeydown = function(e) {
+                switch(e.keyCode) {
+                    case 38:        // Arrow Up
+                        e.preventDefault();
+
+                        if(previous.get_length() != 0) {
+                            input.value = previous.peak();
+                            
+                            next.push(previous.pop());                    
+                        } else { }
+                        break;
+                    case 40:        // Arrow Down
+                        e.preventDefault();
+
+                        if(next.get_length() != 0) {
+                            if(next.get_length() == 1) {
+                                previous.push(next.pop());
+                            } else {
+                                previous.push(next.pop());
+                                
+                                input.value = next.peak();
+                            }
+                        } else { }
+                        break;
+                }
+            }
+
             input.addEventListener("keypress", function(event) {
+                e = event || window.event;
+
+                var keyCode = e.keyCode || e.which;
+
                 if (event.key === "Enter") {
                     event.preventDefault();
-
+                    
+                    previous.push(input.value);
                     send();
                 }
+
+                /* if (keyCode == 38) {     // Arrow Up
+                    event.preventDefault();
+
+                    alert("up");
+                    
+                    if(previous.get_length != 0) {
+                        next.push(previous.peak());
+
+                        input.value = "";
+                        input.value = previous.pop();
+                    }
+                }
+
+                if (keyCode == 40) {      // Arrow Down
+                    event.preventDefault();
+
+                    alert("down");
+
+                    if(next.get_length != 0) {
+                        previous.push(next.peak());
+
+                        input.value = "";
+                        input.value = next.pop();
+                    }
+                } */
             });
         }
 

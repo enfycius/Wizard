@@ -34,10 +34,6 @@
     </script>
 
     <script>
-        var words = new Array(10);
-        var input = null;
-        var cur, index = 0;
-        
         $(function() {
             $("#word").focus();
         });
@@ -45,6 +41,12 @@
         window.onload = function() {
             const previous = new Stack();
             const next = new Stack();
+
+            var pages = <%- pages %>;
+
+            for(var i=0; i<pages.length; i++) {
+                previous.push(pages[i].word);
+            }
 
             input = document.getElementById("word");
 
@@ -86,32 +88,6 @@
                     previous.push(input.value);
                     send();
                 }
-
-                /* if (keyCode == 38) {     // Arrow Up
-                    event.preventDefault();
-
-                    alert("up");
-                    
-                    if(previous.get_length != 0) {
-                        next.push(previous.peak());
-
-                        input.value = "";
-                        input.value = previous.pop();
-                    }
-                }
-
-                if (keyCode == 40) {      // Arrow Down
-                    event.preventDefault();
-
-                    alert("down");
-
-                    if(next.get_length != 0) {
-                        previous.push(next.peak());
-
-                        input.value = "";
-                        input.value = next.pop();
-                    }
-                } */
             });
         }
 

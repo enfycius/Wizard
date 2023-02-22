@@ -52,6 +52,14 @@ h2 a {
           box-shadow: 0 2px 2px -2px #0E1119;
 }
 
+.word {
+  width: 20%;
+}
+
+.kr {
+  width: 30%;
+}
+
 .container {
     text-align: center;
     overflow: auto;

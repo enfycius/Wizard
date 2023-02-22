@@ -20,15 +20,19 @@
             <table class="container">
                 <thead>
                     <tr>
-                        <th><h1>Word</h1></th>
-                        <th><h1>Meaning</h1></th>
+                        <th class="word"><h1>Word</h1></th>
+                        <th class="kr"><h1>KR</h1></th>
+                        <th class="en"><h1>EN</h1></th>
+                        <th class="ex"><h1>EX</h1></th>
                     </tr>
                 </thead>
                 <tbody>
                     <% for (var i=0; i<pages.length; i++) { %>
                     <tr>
-                        <td><%= pages[i].word %></td>
-                        <td><%= pages[i].meaning %></td>
+                        <td class="word"><%= pages[i].word %></td>
+                        <td class="kr"><%= pages[i].kr %></td>
+                        <td class="en"><%- pages[i].en.replace(/\n/g, '<br>') %></td>
+                        <td class="ex"><%- pages[i].ex.replace(/\n/g, '<br>') %></td>
                     </tr>
                 <% } %>
                 </tbody>

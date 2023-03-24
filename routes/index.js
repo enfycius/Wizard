@@ -101,7 +101,7 @@ async function addToMySQL(word) {
       } catch(error) { };
     })();
     
-    if(exist_row[0].length != 0) {
+    if(exist_row != null && exist_row[0].length != 0) {
         await (async() => {
           try {
             const connection = await pool.getConnection(async(conn) => conn);

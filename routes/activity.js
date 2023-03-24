@@ -60,10 +60,6 @@ router.post('/save', function(req, res, next) {
   try {
     connection.query('INSERT INTO Activity VALUES (?, ?)', [req.body.btn_txt, req.body.btn_id], (error, rows) => {
       if (error) throw error;
-      
-      try {
-        addToMyNotion(req.body.btn_txt);
-      } catch(e) {}
 
       res.sendStatus(200);
     })

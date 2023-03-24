@@ -2,6 +2,7 @@ const { Client } = require("@notionhq/client");
 
 var express = require('express');
 var router = express.Router();
+var path = require('path');
 
 const dateTime = require('node-datetime');
 
@@ -12,7 +13,7 @@ const mysql = require('mysql2/promise');
 const dbconfig = require('./../config/database.js');
 const pool = mysql.createPool(dbconfig);
 
-require('dotenv').config();
+require("dotenv").config({ path: path.join(__dirname, './../config/.env') })
 
 // var cur_length = null;
 // var ex_length = null;

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Activity</title>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <link rel="stylesheet" href="/stylesheets/vendors/iconfonts/mdi/css/materialdesignicons.css">
+    <link rel="stylesheet" href="/stylesheets/vendors/css/vendor.addons.css">
+    <link rel="stylesheet" href="/stylesheets/css/shared/style.css">
+    <link rel="stylesheet" href="/stylesheets/css/demo_1/style.css">
+
+    <script>
+        var btn_types = ["btn-outline-success", "btn-outline-warning", "btn-outline-primary", "btn-outline-danger", "btn-outline-info"];
+
+        async function revisedRandId() {
+            return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(2, 10);
+        }
+
+        async function send() {
+            const btn_txt = txt.value;
+            const btn_id = await revisedRandId();
+
+            $.ajax({
+                url: "/activity/save",
+                type: 'POST',
+                data: {
+                    btn_id: btn_id,
+                    btn_txt: btn_txt,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    txt.value = null;
+                    txt.focus();
+                },
+                error: function (xhr, status) {
+                    txt.value = null;
+                    txt.focus();
+                },
+                complete: function () {
+                    const start = 0;
+                    const end = 4;
+                    var random_n = Math.floor((Math.random() * (end-start+1)) + start);
+
+                    $('<button/>', {
+                        text: btn_txt,
+                        id: btn_id,
+                        class: 'btn' + ' ' + btn_types[random_n] + ' ' + 'btn-rounded',
+                        value: btn_txt,
+                        click: function () { 
+                            // $(this).remove(); 
+                            
+                            // $.ajax({
+                            //     url: "/activity/delete",
+                            //     type: 'POST',
+                            //     data: {
+                            //         btn_id: $(this).attr("id"),
+                            //         btn_txt: $(this).text(),
+                            //     },
+                            //     dataType: 'json',
+                            //     success: function (data) {
+                            //         txt.value = null;
+                            //         txt.focus();
+                            //     },
+                            //     error: function (xhr, status) {
+                            //         txt.value = null;
+                            //         txt.focus();
+                            //     },
+                            // });
+
+                            $.ajax({
+                            url: "/activity/check",
+                            type: 'POST',
+                            data: {
+                                btn_txt: $(this).text(),
+                            },
+                            dataType: 'json',
+                            success: function (data) {
+                                txt.value = null;
+                                txt.focus();
+                            },
+                            error: function (xhr, status) {
+                                txt.value = null;
+                                txt.focus();
+                            },
+                        });
+
+                        }
+                    }).appendTo("#btn_list");
+                }
+            });
+        };
+
+        async function del() {
+            const btn_txt = txt.value;
+            const btn_object = document.querySelector("button[value=" + btn_txt + "]");
+            const btn_id = btn_object.getAttribute('id');
+
+            $.ajax({
+                url: "/activity/delete",
+                type: 'POST',
+                data: {
+                    btn_id: btn_id,
+                    btn_txt: btn_txt
+                },
+                dataType: 'json',
+                success: function (data) {
+                    txt.value = null;
+                    txt.focus();
+                },
+                error: function (xhr, status) {
+                    txt.value = null;
+                    txt.focus();
+                },
+                complete: function () {
+                    btn_object.remove();
+                }
+            });
+        };
+
+        $(document).ready(function() {
+            const start = 0;
+            const end = 4;
+
+            var activities = <%- activities %>;
+            
+            input = document.getElementById("register");
+            txt = document.getElementById("btn_txt");
+
+            for(i = 0; i <= activities.length; i++) {
+                var random_n = Math.floor((Math.random() * (end-start+1)) + start);
+
+                $('<button/>', {
+                    text: activities[i].activity,
+                    id: activities[i].id,
+                    class: 'btn' + ' ' + btn_types[random_n] + ' ' + 'btn-rounded',
+                    value: activities[i].activity,
+                    click: function () { 
+                        // $(this).remove();
+
+                        // $.ajax({
+                        //     url: "/activity/delete",
+                        //     type: 'POST',
+                        //     data: {
+                        //         btn_id: $(this).attr("id"),
+                        //         btn_txt: $(this).text(),
+                        //     },
+                        //     dataType: 'json',
+                        //     success: function (data) {
+                        //         txt.value = null;
+                        //         txt.focus();
+                        //     },
+                        //     error: function (xhr, status) {
+                        //         txt.value = null;
+                        //         txt.focus();
+                        //     },
+                        // });
+
+                        $.ajax({
+                            url: "/activity/check",
+                            type: 'POST',
+                            data: {
+                                btn_txt: $(this).text(),
+                            },
+                            dataType: 'json',
+                            success: function (data) {
+                                txt.value = null;
+                                txt.focus();
+                            },
+                            error: function (xhr, status) {
+                                txt.value = null;
+                                txt.focus();
+                            },
+                        });
+                    }
+                }).appendTo("#btn_list");
+            }
+
+            input.addEventListener("keypress", function(event) {
+                e = event || window.event;
+
+                var keyCode = e.keyCode || e.which;
+
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    
+                    send();
+                }
+            });
+
+            
+        });
+    </script>
+  </head>
+  <body class="header-fixed">
+    <nav class="t-header">
+      <div class="t-header-brand-wrapper">
+        <a href="../../index.html">
+          <img class="logo" src="/stylesheets/images/logo.svg" alt="">
+          <img class="logo-mini" src="/stylesheets/images/logo_mini.svg" alt="">
+        </a>
+      </div>
+    </nav>
+    <div class="page-body">
+      <div class="sidebar">
+        <div class="user-profile">
+          <div class="display-avatar animated-avatar">
+            <img class="profile-img img-lg rounded-circle" src="" alt="profile image">
+          </div>
+          <div class="info-wrapper">
+            <p class="user-name">Jonghyeok Kim</p>
+            <h6 class="display-income">Stay Hungry, Stay Foolish.</h6>
+          </div>
+        </div>
+        <ul class="navigation-menu">
+          <li class="nav-category-divider">MAIN</li>
+          <li>
+            <a href="/index">
+              <span class="link-title">Word Dictionary</span>
+              <i class="mdi mdi-gauge link-icon"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="link-title">Charts</span>
+              <i class="mdi mdi-chart-donut link-icon"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <!-- partial -->
+      <div class="page-content-wrapper">
+        <div class="page-content-wrapper-inner">
+          <div class="viewport-header">
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb has-arrow">
+                <li class="breadcrumb-item">
+                  <a href="/index">Main</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Acitivty</li>
+              </ol>
+            </nav>
+          </div>
+          <div class="content-viewport">
+                <div class="grid">
+                  <div class="grid-body">
+                    <h2 class="grid-title">Activities</h2>
+                    <input type="text" class="form-control" id="btn_txt" placeholder="Enter your activity types">
+                    <button type="submit" id="register" onclick="send();" class="btn btn-sm btn-primary">Register</button>
+                    <button type="submit" id="delete" onclick="del();" class="btn btn-sm btn-warning">Delete</button>
+                    <div class="item-wrapper">
+                      <div id="btn_list" class="demo-wrapper">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+        </div>
+        <footer class="footer">
+          <div class="row">
+            <div class="col-sm-6 text-center text-sm-right order-sm-1">
+              <ul class="text-gray">
+                <li><a href="#">Terms of use</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+              </ul>
+            </div>
+            <div class="col-sm-6 text-center text-sm-left mt-3 mt-sm-0">
+              <small class="text-muted d-block">Copyright © 2023 <a href="https://github.com/enfycius/" target="_blank">Enfycius</a>. All rights reserved</small>
+              <small class="text-gray mt-2">Handcrafted With <i class="mdi mdi-heart text-danger"></i></small>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <script src="/stylesheets/vendors/js/core.js"></script>
+    <script src="/stylesheets/vendors/js/vendor.addons.js"></script>
+    <script src="/stylesheets/js/template.js"></script>
+  </body>
+</html>
